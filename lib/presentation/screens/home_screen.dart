@@ -23,95 +23,109 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: widget.color,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: BlocBuilder<InternetCubit, InternetState>(
-                  builder: (context, state) {
-                    if (state is InternetConnected) {
-                      if (state.connectionType == ConnectionType.mobile) {
-                        return const Text("Mobile");
+    return BlocListener<InternetCubit, InternetState>(
+      listener: (context, state) {
+        if (state is InternetConnected) {
+          if (state.connectionType == ConnectionType.mobile) {
+            BlocProvider.of<CounterCubit>(context).increment();
+          }
+          if (state.connectionType == ConnectionType.wifi) {
+            BlocProvider.of<CounterCubit>(context).increment();
+          }
+        } else if (state is InternetDisconnected) {
+          BlocProvider.of<CounterCubit>(context).decrement();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+          backgroundColor: widget.color,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: BlocBuilder<InternetCubit, InternetState>(
+                    builder: (context, state) {
+                      if (state is InternetConnected) {
+                        if (state.connectionType == ConnectionType.mobile) {
+                          return const Text("Mobile");
+                        }
+                        if (state.connectionType == ConnectionType.wifi) {
+                          return const Text("Wi-Fi");
+                        }
+                      } else if (state is InternetDisconnected) {
+                        return const Text("Disconnected");
                       }
-                      if (state.connectionType == ConnectionType.wifi) {
-                        return const Text("Wi-Fi");
-                      }
-                    } else if (state is InternetDisconnected) {
-                      return const Text("Disconnected");
-                    }
 
-                    return const CircularProgressIndicator();
-                  }
+                      return const CircularProgressIndicator();
+                    }
+                ),
               ),
-            ),
-            const Text("You have pushed the button this many times:"),
-            BlocConsumer<CounterCubit, CounterState>(
-              listener: (context, state) {
-                if (state.wasIncremented) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Was Incremented!!!"), duration: Duration(microseconds: 100),));
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Was Decremented!!!"), duration: Duration(microseconds: 100),));
-                }
-              },
-              builder: (context, state) {
-                if (state.counterValue < 0) {
-                  return Text(
-                      "Negative value: ${state.counterValue.toString()}");
-                } else if (state.counterValue % 2 == 0) {
-                  return Text(
-                      "Odd value value: ${state.counterValue.toString()}");
-                } else {
-                  return Text(
-                      "Regular value: ${state.counterValue.toString()}");
-                }
-              },
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                FloatingActionButton(
-                    tooltip: "Decrement",
-                    child: const Icon(Icons.remove),
-                    onPressed: () => {
-                      BlocProvider.of<CounterCubit>(context).decrement()
-                    }
-                ),
-                FloatingActionButton(
-                    tooltip: "Increment",
-                    child: const Icon(Icons.add),
-                    onPressed: () => {
-                      BlocProvider.of<CounterCubit>(context).increment()
-                    }
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                      "/second"
-                  );
+              const Text("You have pushed the button this many times:"),
+              BlocConsumer<CounterCubit, CounterState>(
+                listener: (context, state) {
+                  if (state.wasIncremented) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Was Incremented!!!"), duration: Duration(microseconds: 100),));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Was Decremented!!!"), duration: Duration(microseconds: 100),));
+                  }
                 },
-                child: const Text(
-                  "To the second screen!!!",
-                  style: TextStyle(
-                      color: Colors.white
+                builder: (context, state) {
+                  if (state.counterValue < 0) {
+                    return Text(
+                        "Negative value: ${state.counterValue.toString()}");
+                  } else if (state.counterValue % 2 == 0) {
+                    return Text(
+                        "Odd value value: ${state.counterValue.toString()}");
+                  } else {
+                    return Text(
+                        "Regular value: ${state.counterValue.toString()}");
+                  }
+                },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  FloatingActionButton(
+                      tooltip: "Decrement",
+                      child: const Icon(Icons.remove),
+                      onPressed: () => {
+                        BlocProvider.of<CounterCubit>(context).decrement()
+                      }
+                  ),
+                  FloatingActionButton(
+                      tooltip: "Increment",
+                      child: const Icon(Icons.add),
+                      onPressed: () => {
+                        BlocProvider.of<CounterCubit>(context).increment()
+                      }
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                        "/second"
+                    );
+                  },
+                  child: const Text(
+                    "To the second screen!!!",
+                    style: TextStyle(
+                        color: Colors.white
+                    ),
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(widget.color),
                   ),
                 ),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(widget.color),
-                ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
