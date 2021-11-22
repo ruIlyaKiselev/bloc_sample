@@ -1,9 +1,9 @@
+import 'package:bloc_sample/Core/enums.dart';
 import 'package:bloc_sample/logic/cubit/counter_cubit.dart';
+import 'package:bloc_sample/logic/cubit/internet_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'second_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -32,6 +32,25 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: BlocBuilder<InternetCubit, InternetState>(
+                  builder: (context, state) {
+                    if (state is InternetConnected) {
+                      if (state.connectionType == ConnectionType.mobile) {
+                        return const Text("Mobile");
+                      }
+                      if (state.connectionType == ConnectionType.wifi) {
+                        return const Text("Wi-Fi");
+                      }
+                    } else if (state is InternetDisconnected) {
+                      return const Text("Disconnected");
+                    }
+
+                    return const CircularProgressIndicator();
+                  }
+              ),
+            ),
             const Text("You have pushed the button this many times:"),
             BlocConsumer<CounterCubit, CounterState>(
               listener: (context, state) {
@@ -60,16 +79,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 FloatingActionButton(
                     tooltip: "Decrement",
                     child: const Icon(Icons.remove),
-                    onPressed: () =>
-                    {
+                    onPressed: () => {
                       BlocProvider.of<CounterCubit>(context).decrement()
                     }
                 ),
                 FloatingActionButton(
                     tooltip: "Increment",
                     child: const Icon(Icons.add),
-                    onPressed: () =>
-                    {
+                    onPressed: () => {
                       BlocProvider.of<CounterCubit>(context).increment()
                     }
                 ),
@@ -80,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: TextButton(
                 onPressed: () {
                   Navigator.of(context).pushNamed(
-                    "/second"
+                      "/second"
                   );
                 },
                 child: const Text(
